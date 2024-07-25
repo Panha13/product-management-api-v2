@@ -25,7 +25,11 @@ export const getProductController = (req, res) => {
 
 //Create product controller
 export const createProductController = (req, res) => {
-  const { name, price, stock_quantity, category_id } = req.body;
+  const { image, name, price, stock_quantity } = req.body;
+
+  if (!image) {
+    return res.status(400).json({ error: "Image is required" });
+  }
 
   if (!name || typeof name !== "string" || name.trim() === "") {
     return res.status(400).json({

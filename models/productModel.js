@@ -3,7 +3,7 @@ import connection from "../config/db.js";
 //Get all products
 export const getProducts = (callback) => {
   const query = `
-    SELECT p.product_id, p.name AS product_name, p.description, p.price, p.stock_quantity, c.name AS category
+    SELECT p.product_id, p.image, p.name AS product_name, p.description, p.price, p.stock_quantity, c.name AS category
     FROM products p
     LEFT JOIN categories c ON p.category_id = c.category_id
   `;
@@ -17,7 +17,7 @@ export const getProducts = (callback) => {
 //Get product by id
 export const getProduct = (product_id, callback) => {
   const query = `
-    SELECT p.product_id, p.name AS product_name, p.description, p.price, p.stock_quantity, c.name AS category
+    SELECT p.product_id, p.image, p.name AS product_name, p.description, p.price, p.stock_quantity, c.name AS category
     FROM products p
     LEFT JOIN categories c ON p.category_id = c.category_id
     WHERE p.product_id = ?
@@ -32,12 +32,13 @@ export const getProduct = (product_id, callback) => {
 
 //Create product model
 export const createProduct = (product, callback) => {
-  const { name, description, price, stock_quantity, category_id } = product;
+  const { image, name, description, price, stock_quantity, category_id } =
+    product;
   const query =
-    "INSERT INTO products (name, description, price, stock_quantity, category_id) VALUES (?, ?, ?, ?,?)";
+    "INSERT INTO products (image, name, description, price, stock_quantity, category_id) VALUES (?, ?, ?, ?, ?,?)";
   connection.query(
     query,
-    [name, description, price, stock_quantity, category_id],
+    [image, name, description, price, stock_quantity, category_id],
     (err, results) => {
       if (err) return callback(err);
       callback(null, results.insertId);
@@ -47,15 +48,16 @@ export const createProduct = (product, callback) => {
 
 // Update product model
 export const updateProduct = (product_id, product, callback) => {
-  const { name, description, price, stock_quantity, category_id } = product;
+  const { image, name, description, price, stock_quantity, category_id } =
+    product;
   const query = `
       UPDATE products
-      SET name = ?, description = ?, price = ?, stock_quantity = ?, category_id = ?
+      SET image=?, name = ?, description = ?, price = ?, stock_quantity = ?, category_id = ?
       WHERE product_id = ?
     `;
   connection.query(
     query,
-    [name, description, price, stock_quantity, category_id, product_id],
+    [image, name, description, price, stock_quantity, category_id, product_id],
     (err, results) => {
       if (err) return callback(err);
       callback(null, results.affectedRows);
