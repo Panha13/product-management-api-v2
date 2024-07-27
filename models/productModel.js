@@ -1,7 +1,11 @@
 import connection from "../config/db.js";
 
 //Get all products
-export const getProducts = (callback) => {
+export const getProducts = (page, pageSize, searchQuery = "", callback) => {
+  const offset = (page - 1) * pageSize;
+  const searchPattern = `%${searchQuery}%`;
+
+  // SQL query with search filter
   const query = `
     SELECT 
       p.product_id, 
@@ -16,11 +20,37 @@ export const getProducts = (callback) => {
       ) AS category
     FROM products p
     LEFT JOIN categories c ON p.category_id = c.category_id
+    WHERE p.name LIKE ? OR c.name LIKE ?
+    ORDER BY p.created_at DESC
+    LIMIT ? OFFSET ?
   `;
-  connection.query(query, (err, results) => {
-    if (err) return callback(err);
-    callback(null, results);
-  });
+
+  // Count query with search filter
+  const countProduct = `
+    SELECT COUNT(*) AS total
+    FROM products p
+    LEFT JOIN categories c ON p.category_id = c.category_id
+    WHERE p.name LIKE ? OR c.name LIKE ?
+  `;
+
+  connection.query(
+    query,
+    [searchPattern, searchPattern, pageSize, offset],
+    (err, products) => {
+      if (err) return callback(err);
+
+      // Fetch total count of products
+      connection.query(
+        countProduct,
+        [searchPattern, searchPattern],
+        (err, results) => {
+          if (err) return callback(err);
+          const total = results[0].total;
+          callback(null, products, total);
+        }
+      );
+    }
+  );
 };
 
 //Get product by id

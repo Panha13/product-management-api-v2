@@ -6,11 +6,20 @@ import {
   updateProduct,
 } from "../models/productModel.js";
 
-//Get product controller
+//Get products controller
 export const getProductsController = (req, res) => {
-  getProducts((err, products) => {
+  const page = parseInt(req.query.page, 10) || 1;
+  const pageSize = parseInt(req.query.pageSize, 10) || 10;
+  const searchQuery = req.query.searchQuery || "";
+
+  getProducts(page, pageSize, searchQuery, (err, products, total) => {
     if (err) return res.status(500).json({ error: "Internal Server Error" });
-    res.status(200).json(products);
+    res.status(200).json({
+      data: products,
+      total,
+      page,
+      pageSize,
+    });
   });
 };
 
