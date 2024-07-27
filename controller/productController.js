@@ -46,13 +46,13 @@ export const createProductController = (req, res) => {
     });
   }
 
-  if (!price || typeof price !== "number") {
+  if (typeof price !== "number" || isNaN(price)) {
     return res.status(400).json({
       error: "Price is required and should be number!",
     });
   }
 
-  if (!stock_quantity || !Number.isInteger(stock_quantity)) {
+  if (typeof stock_quantity !== "number" || !Number.isInteger(stock_quantity)) {
     return res.status(400).json({
       error: "Stock quantity is required and should be an integer!",
     });
@@ -67,6 +67,28 @@ export const createProductController = (req, res) => {
 //Update product controller
 export const updateProdctController = (req, res) => {
   const { product_id } = req.params;
+  const { image, name, price, stock_quantity } = req.body;
+  if (!image) {
+    return res.status(400).json({ error: "Image is required" });
+  }
+
+  if (!name || typeof name !== "string" || name.trim() === "") {
+    return res.status(400).json({
+      error: "Category name is required and must be a non-empty string.",
+    });
+  }
+
+  if (typeof price !== "number" || isNaN(price)) {
+    return res.status(400).json({
+      error: "Price is required and should be number!",
+    });
+  }
+
+  if (typeof stock_quantity !== "number" || !Number.isInteger(stock_quantity)) {
+    return res.status(400).json({
+      error: "Stock quantity is required and should be an integer!",
+    });
+  }
   updateProduct(product_id, req.body, (err, affectedRows) => {
     if (err) return res.status(500).json({ error: "Internal Server Error" });
     if (affectedRows === 0)

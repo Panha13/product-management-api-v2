@@ -31,7 +31,7 @@ export const createCategoryController = (req, res) => {
   });
 };
 
-//Get all category
+//Get all categories
 export const getCategoriesController = (req, res) => {
   getCategories((err, categories) => {
     if (err) return res.status(500).json({ error: "Internal Server Error" });
