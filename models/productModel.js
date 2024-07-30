@@ -20,7 +20,7 @@ export const getProducts = (page, pageSize, searchQuery = "", callback) => {
       ) AS category
     FROM products p
     LEFT JOIN categories c ON p.category_id = c.category_id
-    WHERE p.name LIKE ? OR c.name LIKE ?
+    WHERE p.name LIKE ? 
     ORDER BY p.created_at DESC
     LIMIT ? OFFSET ?
   `;
@@ -30,25 +30,21 @@ export const getProducts = (page, pageSize, searchQuery = "", callback) => {
     SELECT COUNT(*) AS total
     FROM products p
     LEFT JOIN categories c ON p.category_id = c.category_id
-    WHERE p.name LIKE ? OR c.name LIKE ?
+    WHERE p.name LIKE ? 
   `;
 
   connection.query(
     query,
-    [searchPattern, searchPattern, pageSize, offset],
+    [searchPattern, pageSize, offset],
     (err, products) => {
       if (err) return callback(err);
 
       // Fetch total count of products
-      connection.query(
-        countProduct,
-        [searchPattern, searchPattern],
-        (err, results) => {
-          if (err) return callback(err);
-          const total = results[0].total;
-          callback(null, products, total);
-        }
-      );
+      connection.query(countProduct, [searchPattern], (err, results) => {
+        if (err) return callback(err);
+        const total = results[0].total;
+        callback(null, products, total);
+      });
     }
   );
 };
