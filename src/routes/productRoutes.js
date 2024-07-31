@@ -1,10 +1,10 @@
 import express from "express";
 import {
   createProductController,
-  deleteProudctController,
+  deleteProductController,
   getProductController,
   getProductsController,
-  updateProdctController,
+  updateProductController,
 } from "../controller/productController.js";
 
 const router = express.Router();
@@ -12,7 +12,7 @@ const router = express.Router();
 router.get("/products", getProductsController);
 router.get("/products/:product_id", getProductController);
 router.post("/products", createProductController);
-router.put("/products/:product_id", updateProdctController);
-router.delete("/products/:product_id", deleteProudctController);
+router.put("/products/:product_id", updateProductController);
+router.delete("/products/:product_id", deleteProductController);
 
 export default router;
