@@ -131,6 +131,7 @@ export const updateProduct = async (product_id, products) => {
     });
     return updatedProduct;
   } catch (err) {
+    console.log(err);
     throw new Error("Internal Server Error");
   }
 };
