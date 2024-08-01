@@ -68,11 +68,15 @@ export const getProduct = async (product_id) => {
 
 // Create products
 export const createProduct = async (products) => {
-  const { image, name, price, stock_quantity, category_id, unit_id } = products;
-  // Validate required fields
-  if (!image || !name || !price || !stock_quantity || !unit_id) {
-    throw new Error("Required fields missing");
-  }
+  const {
+    image,
+    name,
+    price,
+    stock_quantity,
+    description,
+    category_id,
+    unit_id,
+  } = products;
 
   try {
     // Generate the new product code
@@ -86,6 +90,7 @@ export const createProduct = async (products) => {
         name,
         price,
         stock_quantity,
+        description,
         category_id,
         unit_id,
       },
@@ -101,21 +106,31 @@ export const createProduct = async (products) => {
 
 // Update products
 export const updateProduct = async (product_id, products) => {
-  const { image, name, price, stock_quantity, category_id } = products;
-
-  if (!image || !name || !price || !stock_quantity) {
-    throw new Error("Required fields missing");
-  }
+  const {
+    image,
+    name,
+    price,
+    stock_quantity,
+    description,
+    category_id,
+    unit_id,
+  } = products;
 
   try {
-    return await prisma.products.update({
+    const updatedProduct = await prisma.products.update({
       where: { product_id: parseInt(product_id, 10) },
-      data: { image, name, price, stock_quantity, category_id },
+      data: {
+        image,
+        name,
+        price,
+        stock_quantity,
+        description,
+        category_id,
+        unit_id,
+      },
     });
+    return updatedProduct;
   } catch (err) {
-    if (err.code === "P2025") {
-      throw new Error("products not found");
-    }
     throw new Error("Internal Server Error");
   }
 };

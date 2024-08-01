@@ -25,7 +25,7 @@ model Products {
 
 model Categories {
   category_id Int        @id @default(autoincrement())
-  name        String
+  name        String     @unique
   description String?
   products    Products[]
   createdAt   DateTime   @default(now())

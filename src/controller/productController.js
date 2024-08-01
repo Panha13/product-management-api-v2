@@ -5,6 +5,10 @@ import {
   updateProduct,
   deleteProduct,
 } from "../services/productService.js";
+import {
+  validateCreateProductData,
+  validateUpdateProductData,
+} from "../utils/validation.js";
 
 // Get all products
 export const getProductsController = async (req, res) => {
@@ -34,43 +38,34 @@ export const getProductController = async (req, res) => {
   }
 };
 
-// Create product
+// Create product Controller
 export const createProductController = async (req, res) => {
-  const { image, name, price, stock_quantity, category_id, unit_id } = req.body;
+  const validationError = validateCreateProductData(req.body);
+  if (validationError) {
+    return res.status(400).json({ error: validationError });
+  }
 
   try {
-    const product = await createProduct({
-      image,
-      name,
-      price,
-      stock_quantity,
-      category_id,
-      unit_id,
-    });
+    const product = await createProduct(req.body);
     res.status(201).json(product);
   } catch (err) {
     res.status(400).json({ error: err.message });
   }
 };
 
-// Update product
+// Update Product Controller
 export const updateProductController = async (req, res) => {
   const { product_id } = req.params;
-  const { image, name, price, stock_quantity, category_id } = req.body;
+  const validationError = validateUpdateProductData(req.body);
+  if (validationError) {
+    return res.status(400).json({ error: validationError });
+  }
 
   try {
-    const product = await updateProduct(product_id, {
-      image,
-      name,
-      price,
-      stock_quantity,
-      category_id,
-    });
+    const product = await updateProduct(product_id, req.body);
     res.status(200).json(product);
   } catch (err) {
-    res
-      .status(err.message === "Product not found" ? 404 : 400)
-      .json({ error: err.message });
+    res.status(400).json({ error: err.message });
   }
 };
 

@@ -1,18 +1,38 @@
 import {
   createCategory,
   getCategories,
-  getCategoyById,
-  updatecategory,
+  getCategoryById,
+  updateCategory,
   deleteCategory,
-} from "../models/categoryModel.js";
+} from "../services/categoryService.js";
 
-//Create Category
-export const createCategoryController = (req, res) => {
-  // Without destructuring
-  // const name = req.body.name;
-  // const description = req.body.description;
-  // With destructuring
-  const { name } = req.body;
+//Get all categories
+export const getCategoriesController = async (req, res) => {
+  try {
+    const categories = await getCategories();
+    res.status(200).json(categories);
+  } catch (err) {
+    res.status(500).json({ error: "Internal Server Error" });
+  }
+};
+
+//Get By Category ID
+export const getCategoryByIdController = async (req, res) => {
+  const { category_id } = req.params;
+
+  try {
+    const category = await getCategoryById(parseInt(category_id, 10));
+    if (!category) return res.status(404).json({ error: "Category not found" });
+    res.status(200).json(category);
+  } catch (error) {
+    console.log(error);
+    res.status(500).json({ error: "Internal Server Error" });
+  }
+};
+
+//Create Category Controller
+export const createCategoryController = async (req, res) => {
+  const { name, description } = req.body;
 
   if (!name || typeof name !== "string" || name.trim() === "") {
     return res.status(400).json({
@@ -20,52 +40,42 @@ export const createCategoryController = (req, res) => {
     });
   }
 
-  createCategory(req.body, (err, categoryId) => {
-    if (err) {
-      if (err.code === "ER_DUP_ENTRY") {
-        return res.status(409).json({ error: "Category name already exists" });
-      }
-      return res.status(500).json({ error: "Internal Server Error" });
+  try {
+    const category = await createCategory({ name, description });
+    res.status(201).json({ categoryId: category.category_id });
+  } catch (err) {
+    if (err.code === "P2002") {
+      return res.status(409).json({ error: "Category name already exists" });
     }
-    res.status(201).json({ categoryId });
-  });
+    res.status(500).json({ error: "Internal Server Error" });
+  }
 };
 
-//Get all categories
-export const getCategoriesController = (req, res) => {
-  getCategories((err, categories) => {
-    if (err) return res.status(500).json({ error: "Internal Server Error" });
-    res.status(200).json(categories);
-  });
-};
-
-//Get category by id
-export const getCategoyByIdController = (req, res) => {
+//Update Category Controller
+export const updateCategoryController = async (req, res) => {
   const { category_id } = req.params;
-  getCategoyById(category_id, (err, category) => {
-    if (err) return res.status(404).json({ error: err.message });
+
+  try {
+    const category = await updateCategory(parseInt(category_id, 10), req.body);
     res.status(200).json(category);
-  });
+  } catch (err) {
+    if (err.code === "P2002") {
+      return res.status(409).json({ error: "Category name already exists" });
+    }
+    res.status(500).json({ error: err.message });
+  }
 };
 
-//Update category
-export const updatecategoryController = (req, res) => {
+//Delete Category Controller
+export const deleteCategoryController = async (req, res) => {
   const { category_id } = req.params;
-  updatecategory(category_id, req.body, (err, affectedRows) => {
-    if (err) return res.status(500).json({ error: "Internal Server Error" });
-    if (affectedRows === 0)
-      return res.status(404).json({ error: "Category not found" });
-    res.status(200).json({ message: "Category updated" });
-  });
-};
 
-//Delete Category controller
-export const deleteCategoryController = (req, res) => {
-  const { category_id } = req.params;
-  deleteCategory(category_id, (err, affectedRows) => {
-    if (err) return res.status(500).json({ error: "Internal Server Error" });
-    if (affectedRows === 0)
-      return res.status(404).json({ error: "Category not found" });
+  try {
+    await deleteCategory(parseInt(category_id, 10));
     res.status(200).json({ message: "Category deleted" });
-  });
+  } catch (err) {
+    res
+      .status(err.message === "Category not found" ? 404 : 500)
+      .json({ error: err.message });
+  }
 };
