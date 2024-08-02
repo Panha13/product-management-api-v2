@@ -25,7 +25,6 @@ export const getCategoryByIdController = async (req, res) => {
     if (!category) return res.status(404).json({ error: "Category not found" });
     res.status(200).json(category);
   } catch (error) {
-    console.log(error);
     res.status(500).json({ error: "Internal Server Error" });
   }
 };

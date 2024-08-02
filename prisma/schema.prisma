@@ -34,7 +34,7 @@ model Categories {
 
 model Unit {
   unit_id     Int        @id @default(autoincrement())
-  name        String
+  name        String     @unique
   description String?
   products    Products[]
 }
