@@ -19,8 +19,8 @@ model Products {
   category       Categories? @relation(fields: [category_id], references: [category_id])
   unit_id        Int
   unit           Unit        @relation(fields: [unit_id], references: [unit_id])
-  createdAt      DateTime    @default(now())
-  updatedAt      DateTime    @default(now()) @updatedAt
+  createdAt      DateTime    @default(now()) @db.Timestamp(3)
+  updatedAt      DateTime    @default(now()) @updatedAt @db.Timestamp(3)
 }
 
 model Categories {
@@ -28,8 +28,8 @@ model Categories {
   name        String     @unique
   description String?
   products    Products[]
-  createdAt   DateTime   @default(now())
-  updatedAt   DateTime   @default(now()) @updatedAt
+  createdAt   DateTime   @default(now()) @db.Timestamp(3)
+  updatedAt   DateTime   @default(now()) @updatedAt @db.Timestamp(3)
 }
 
 model Unit {
@@ -37,4 +37,6 @@ model Unit {
   name        String     @unique
   description String?
   products    Products[]
+  createdAt   DateTime   @default(now()) @db.Timestamp(3)
+  updatedAt   DateTime   @default(now()) @updatedAt @db.Timestamp(3)
 }

@@ -4,7 +4,7 @@ const validatePrice = (price) => typeof price === "number" && price >= 0;
 const validateStockQuantity = (stock_quantity) =>
   typeof stock_quantity === "number" && stock_quantity >= 0;
 const validateCategoryId = (category_id) =>
-  Number.isInteger(category_id) || category_id === undefined;
+  Number.isInteger(category_id) || category_id === null;
 const validateUnitId = (unit_id) => typeof unit_id === "number";
 
 export const validateCreateProductData = (data) => {

@@ -15,7 +15,7 @@ export const getProducts = async (page, pageSize, searchQuery = "") => {
       skip: offset,
       take: pageSize,
       orderBy: {
-        createdAt: "desc",
+        product_id: "desc",
       },
       include: {
         category: {
