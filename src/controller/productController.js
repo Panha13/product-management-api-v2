@@ -9,6 +9,7 @@ import {
   validateCreateProductData,
   validateUpdateProductData,
 } from "../utils/validation.js";
+import { uploadImage } from "../utils/uploadImage.js";
 
 // Get all products
 export const getProductsController = async (req, res) => {
@@ -40,13 +41,27 @@ export const getProductController = async (req, res) => {
 
 // Create product Controller
 export const createProductController = async (req, res) => {
-  const validationError = validateCreateProductData(req.body);
-  if (validationError) {
-    return res.status(400).json({ error: validationError });
-  }
+  // const validationError = validateCreateProductData(req.body);
+  // if (validationError) {
+  //   return res.status(400).json({ error: validationError });
+  // }
+  const price = parseFloat(req.body.price);
+  const stock_quantity = parseInt(req.body.stock_quantity);
+  const unit_id = parseInt(req.body.unit_id);
+  const category_id = parseInt(req.body.category_id);
 
   try {
-    const product = await createProduct(req.body);
+    const imageUrl = await uploadImage(req.file);
+    const productData = {
+      ...req.body,
+      image: imageUrl,
+      price,
+      stock_quantity,
+      unit_id,
+      category_id,
+    };
+    const product = await createProduct(productData);
+    // const product = await createProduct(req.body);
     res.status(201).json(product);
   } catch (err) {
     res.status(400).json({ error: err.message });

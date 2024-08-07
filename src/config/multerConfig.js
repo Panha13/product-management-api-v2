@@ -1,29 +1,38 @@
 import multer from "multer";
 import path from "path";
+import { fileURLToPath } from "url";
 
-// Set up storage engine
+// Get the directory name of the current module
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+
+// Define the storage configuration
 const storage = multer.diskStorage({
   destination: (req, file, cb) => {
-    cb(null, "uploads"); // Directory to save uploaded files
+    cb(null, path.join(__dirname, "../uploads")); // Directory where images will be stored
   },
   filename: (req, file, cb) => {
     const ext = path.extname(file.originalname);
-    cb(null, `${Date.now()}${ext}`);
+    cb(null, Date.now() + ext); // Use timestamp as the filename
   },
 });
 
-// File filter to accept only images
-const fileFilter = (req, file, cb) => {
-  if (file.mimetype.startsWith("image/")) {
-    cb(null, true);
-  } else {
-    cb(new Error("Not an image! Please upload an image."), false);
-  }
-};
-
+// Create an upload instance
 const upload = multer({
   storage,
-  fileFilter,
+  fileFilter: (req, file, cb) => {
+    // Ensure only image files are allowed
+    const filetypes = /jpeg|jpg|png|gif/;
+    const mimetype = filetypes.test(file.mimetype);
+    const extname = filetypes.test(
+      path.extname(file.originalname).toLowerCase()
+    );
+    if (mimetype && extname) {
+      return cb(null, true);
+    } else {
+      cb(new Error("Only image files are allowed!"));
+    }
+  },
 });
 
 export default upload;
